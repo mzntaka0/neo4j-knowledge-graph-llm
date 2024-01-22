@@ -15,11 +15,11 @@ langchainhub = "^0.1.14"
 langchain-openai = "^0.0.2.post1"
 langchain-core = "^0.1.12"
 langchain-community = "^0.0.13"
-bpython = "^0.24"
 
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.13"
+bpython = "^0.24"
 
 [build-system]
 requires = ["poetry-core"]

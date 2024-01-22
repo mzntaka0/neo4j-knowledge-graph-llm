@@ -1,24 +1,12 @@
-# tag::importtool[]
 from langchain.tools import Tool
-
-# end::importtool[]
 from langchain.agents import AgentExecutor, create_react_agent
-
-# tag::importmemory[]
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
 
-# end::importmemory[]
-
 from solutions.llm import llm
-
-# Use the Chains built in the previous lessons
+from solutions.tools.finetuned import cypher_qa
 from solutions.tools.vector import kg_qa
 
-# from solutions.tools.fewshot import cypher_qa
-from solutions.tools.finetuned import cypher_qa
-
-# tag::tools[]
 tools = [
     Tool.from_function(
         name="General Chat",
@@ -39,23 +27,20 @@ tools = [
         return_direct=True,
     ),
 ]
-# end::tools[]
 
-
-# tag::memory[]
 memory = ConversationBufferWindowMemory(
     memory_key="chat_history",
     k=5,
     return_messages=True,
 )
-# end::memory[]
 
-# tag::agent[]
 agent_prompt = PromptTemplate.from_template(
     """
 You are a movie expert providing information about movies.
 Be as helpful as possible and return as much information as possible.
 Do not answer any questions that do not relate to movies, actors or directors.
+The instruction is coming in Japanese so you must translate the instruction and then process this task.
+And then response in Japanese even if the context is in English.
 
 Do not answer any questions using your pre-trained knowledge, only use the information provided in the context.
 
@@ -93,10 +78,8 @@ New input: {input}
 )
 agent = create_react_agent(llm, tools, agent_prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools, memory=memory, verbose=True)
-# end::agent[]
 
 
-# tag::generate_response[]
 def generate_response(prompt):
     """
     Create a handler that calls the Conversational agent
@@ -106,16 +89,11 @@ def generate_response(prompt):
     response = agent_executor.invoke(
         {"input": prompt}, return_only_outputs=True, include_run_info=True
     )
-    print("response", response)
-
     return (
         response["output"]
         if isinstance(response["output"], str)
         else response["output"]["result"]
     )
-
-
-# end::generate_response[]
 
 
 """
